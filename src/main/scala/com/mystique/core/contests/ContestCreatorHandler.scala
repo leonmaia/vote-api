@@ -25,7 +25,7 @@ class ContestCreatorHandler (val redis: Client, config: Config) extends Service[
           Future(respond("", HttpResponseStatus.CREATED, locationHeader = location))
         }
         case Failure(f) =>
-          Future(respond("", HttpResponseStatus.BAD_REQUEST))
+          Future(respond("Errors!", HttpResponseStatus.BAD_REQUEST))
       }
     }
   }

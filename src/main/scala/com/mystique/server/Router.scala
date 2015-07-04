@@ -12,5 +12,6 @@ trait Router extends Handlers {
     case Method.Get ->  Root / "healthcheck" => heathCheckHandler
     case Method.Post -> Root / "contests"    => contestCreatorHandler
     case Method.Get ->  Root / "contests"    => contestHandler
+    case Method.Post->  Root / "contest" / contestSlug / "candidates" => candidateHandler.create(contestSlug)
   })
 }
