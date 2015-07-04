@@ -1,5 +1,6 @@
 package com.mystique.service.tracing
 
+import com.mystique.server.ApiConfig
 import com.twitter.finagle.RequestTimeoutException
 import com.twitter.finagle.tracing.{Annotation, Trace}
 import com.twitter.finagle.util.DefaultTimer
@@ -12,7 +13,7 @@ trait Tracing {
   val log = Logger(getClass)
 
   def withTrace[T](id: String, protocol: String = "custom", timeout: Duration = fromSeconds(1)) (block: => Future[T]) = {
-    Trace.traceService(id, protocol, Option.empty) {
+    if (ApiConfig.isNotDev) Trace.traceService(id, protocol, Option.empty) {
       Trace.record(Annotation.ClientSend())
       val time = System.currentTimeMillis()
       withTimeout(id, timeout, block) map { res =>
@@ -20,7 +21,7 @@ trait Tracing {
         Trace.record(Annotation.ClientRecv())
         res
       }
-    }
+    } else block
   }
 
   private[tracing] def withTimeout[T](id: String = s"${getClass.getSimpleName}", duration: Duration, block: => Future[T]): Future[T] = {

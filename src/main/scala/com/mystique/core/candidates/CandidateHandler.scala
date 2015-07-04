@@ -17,7 +17,6 @@ class CandidateHandler(val redis: Client, config: Config) extends Tracing {
 
   def create(contestSlug: String) = new Service[Request, Response] {
     def apply(request: Request): Future[Response] = {
-      println(request)
       withTrace("CandidateHandler- #create", "CandidateHandler") {
         Try(Candidate(request)) match {
           case Success(c) => {
