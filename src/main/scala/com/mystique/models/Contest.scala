@@ -16,6 +16,16 @@ object Contest extends JsonSupport{
       }
     }
   }
+
+  def fromMap(map: Map[String, String]): Contest = {
+    Contest(
+      map.getOrElse("slug", ""),
+      map.getOrElse("name", ""),
+      map.get("description"),
+      map.getOrElse("start_date", ""),
+      map.getOrElse("end_date", ""))
+
+  }
 }
 
 case class Contest(slug: String,
