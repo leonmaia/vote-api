@@ -5,7 +5,6 @@ import com.mystique.util.JsonSupport
 import com.twitter.finagle.http.Request
 
 object Candidate extends JsonSupport {
-
   def apply(request: Request): Candidate={
     try {
       fromJson[Candidate](request.getContentString())
@@ -14,6 +13,13 @@ object Candidate extends JsonSupport {
         throw e.getCause
       }
     }
+  }
+
+  def fromMap(map: Map[String, String]): Candidate = {
+    Candidate(
+      map.get("id").get.toInt,
+      map.get("name").get,
+      map.get("avatar"))
   }
 }
 

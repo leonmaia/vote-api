@@ -13,5 +13,6 @@ trait Router extends Handlers {
     case Method.Post -> Root / "contests"    => contestCreatorHandler
     case Method.Get ->  Root / "contests"    => contestHandler
     case Method.Post->  Root / "contest" / contestSlug / "candidates" => candidateHandler.create(contestSlug)
+    case Method.Get ->  Root / "contest" / contestSlug / "candidates" => candidateHandler.list(contestSlug)
   })
 }

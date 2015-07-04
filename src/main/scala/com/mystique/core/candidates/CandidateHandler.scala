@@ -7,7 +7,7 @@ import com.mystique.util.RedisUtils._
 import com.twitter.finagle.Service
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finagle.redis.Client
-import com.twitter.util.Future
+import com.twitter.util.{Await, Future}
 import com.typesafe.config.Config
 import org.jboss.netty.handler.codec.http.HttpResponseStatus
 
@@ -26,6 +26,18 @@ class CandidateHandler(val redis: Client, config: Config) extends Tracing {
           }
           case Failure(f) =>
             Future(respond(s"Errors!", HttpResponseStatus.BAD_REQUEST))
+        }
+      }
+    }
+  }
+
+  def list(contestSlug: String) = new Service[Request, Response] {
+    def apply(request: Request): Future[Response] = {
+      withTrace("CandidateHandler- # list", "CandidateHandler") {
+        val keys = Await.result(redis.simpleGetKeys(s"candidate:contest:$contestSlug:*"))
+        redis.simpleHMGetAll(keys) map {
+          case Some(r) => respond(toJson(r map Candidate.fromMap), HttpResponseStatus.OK)
+          case _ => respond(List.empty, HttpResponseStatus.OK)
         }
       }
     }
