@@ -5,9 +5,10 @@ import java.net.InetSocketAddress
 import com.twitter.finagle.builder.ServerBuilder
 import com.twitter.finagle.http.{Request, _}
 import com.twitter.finagle.zipkin.thrift.ZipkinTracer
+import com.twitter.server.TwitterServer
 import com.twitter.util.Await
 
-object Server extends Router {
+object Server extends TwitterServer with Router {
 
   def main() {
     HttpMuxer.addRichHandler("/", router)
