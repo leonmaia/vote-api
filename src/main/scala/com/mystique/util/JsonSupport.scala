@@ -19,9 +19,5 @@ trait JsonSupport {
   def fromJson[T](json: String)(implicit m: Manifest[T]): T = {
     mapper.readValue[T](json)
   }
-
-  def fromJson[T](json: Array[Byte])(implicit m: Manifest[T]): T = {
-    mapper.readValue[T](json)
-  }
 }
 
