@@ -26,3 +26,5 @@ addCommandAlias("test", "testQuick")
 addCommandAlias("devrun", "~re-start")
 
 addCommandAlias("cov", "; clean; coverage; test")
+
+Revolver.settings
