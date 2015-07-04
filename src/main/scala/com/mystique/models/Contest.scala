@@ -1,13 +1,29 @@
 package com.mystique.models
 
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonMappingException
 import com.mystique.util.DateSupport._
+import com.mystique.util.JsonSupport
+import com.twitter.finagle.http.Request
+
+object Contest extends JsonSupport{
+  def apply(request: Request): Contest ={
+    try {
+      fromJson[Contest](request.getContentString())
+    }  catch {
+      case e: JsonMappingException => {
+        throw e.getCause
+      }
+    }
+  }
+}
 
 case class Contest(slug: String,
                    name: String,
                    description: Option[String],
-                   startDate: String,
-                   endDate: String ) {
-  
+                   @JsonProperty("start_date")startDate: String,
+                   @JsonProperty("end_date")endDate: String ) {
+
   require(slug.nonEmpty, "slug is required")
   require(slug.length > 2 && slug.length < 21, "slug is maximum 20 and minimum 3")
 
@@ -23,5 +39,14 @@ case class Contest(slug: String,
   require(isValidDate(endDate), "end_date should be a date")
 
   require(fmt.parse(startDate).before(fmt.parse(endDate)), "start_date should be before end_date")
-}
 
+  def toMap = {
+    Map(
+      "slug" -> slug,
+      "name" -> name,
+      "description" -> description.getOrElse(""),
+      "start_date" -> startDate,
+      "end_date" -> endDate
+    )
+  }
+}

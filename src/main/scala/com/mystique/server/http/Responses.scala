@@ -7,9 +7,10 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus
 
 object Responses extends JsonSupport {
 
-  def respond(obj: Any, status: HttpResponseStatus = HttpResponseStatus.OK, contentType: String = "application/json"): Response = {
+  def respond(obj: Any, status: HttpResponseStatus = HttpResponseStatus.OK, contentType: String = "application/json", locationHeader: String = ""): Response = {
     val res = Response()
     res.setStatusCode(status.getCode)
+    res.location = locationHeader
     res.setContentType(contentType)
     res.setContent(serialize(obj))
 
