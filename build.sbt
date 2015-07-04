@@ -18,3 +18,11 @@ libraryDependencies ++= Seq(
 libraryDependencies ++= Seq(
   "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test"
 )
+
+ScoverageSbtPlugin.ScoverageKeys.coverageMinimum := 65
+
+addCommandAlias("test", "testQuick")
+
+addCommandAlias("devrun", "~re-start")
+
+addCommandAlias("cov", "; clean; coverage; test")
