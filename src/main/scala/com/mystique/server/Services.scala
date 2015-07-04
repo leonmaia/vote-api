@@ -7,6 +7,7 @@ import com.twitter.server.TwitterServer
 
 trait Services extends ConfigLoader {
   self: TwitterServer =>
+
  lazy val redisClient = Redis.newRichClient(config.getString("redis.host"))
 }
 

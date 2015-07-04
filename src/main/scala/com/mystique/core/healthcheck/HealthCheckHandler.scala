@@ -7,6 +7,7 @@ import com.twitter.util.Future
 import org.jboss.netty.handler.codec.http.HttpResponseStatus
 
 class HealthCheckHandler() extends Service[Request, Response] {
+
   def apply(request: Request): Future[Response] =  {
     Future(respond("It Works! Yay!", HttpResponseStatus.OK))
   }
