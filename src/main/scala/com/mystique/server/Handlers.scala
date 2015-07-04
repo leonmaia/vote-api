@@ -7,7 +7,7 @@ import com.twitter.server.TwitterServer
 trait Handlers extends Services {
   self: TwitterServer =>
 
-  lazy val contestCreatorHandler = new ContestCreatorHandler(redisClient)
+  lazy val contestCreatorHandler = new ContestCreatorHandler(redisClient, ApiConfig.config)
   lazy val heathCheckHandler = new HealthCheckHandler
 }
 
