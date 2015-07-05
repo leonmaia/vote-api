@@ -25,16 +25,20 @@ class VoteHandler(client: Client) extends Tracing {
     }
   }
 
+  def withResult(key: String) = {
+    client.simpleGet(key) map {
+      case Some(v) => Try(v.toLong) match {
+        case Success(i) => respond(toJson(Vote(i)), HttpResponseStatus.OK)
+        case Failure(f) => respond(List.empty, HttpResponseStatus.OK)
+      }
+      case _ => respond(List.empty, HttpResponseStatus.OK)
+    }
+  }
+
   def get(contestSlug: String, idCandidate: String) = new Service[Request, Response] {
     def apply(request: Request): Future[Response] = {
       withTrace("VoteHandler- #get", "VoteHandler") {
-        client.simpleGet(s"votes:contest:$contestSlug:candidate:$idCandidate") map {
-          case Some(v) => Try(v.toLong) match {
-            case Success(i) => respond(toJson(Vote(i)), HttpResponseStatus.OK)
-            case Failure(f) => respond(List.empty, HttpResponseStatus.OK)
-          }
-          case _ => respond(List.empty, HttpResponseStatus.OK)
-        }
+        withResult(s"votes:contest:$contestSlug:candidate:$idCandidate")
       }
     }
   }
@@ -42,13 +46,7 @@ class VoteHandler(client: Client) extends Tracing {
   def result(contestSlug: String) = new Service[Request, Response] {
     def apply(request: Request): Future[Response] = {
       withTrace("VoteHandler- #result", "VoteHandler") {
-        client.simpleGet(s"votes:contest:$contestSlug") map {
-          case Some(v) => Try(v.toLong) match {
-            case Success(i) => respond(toJson(Vote(i)), HttpResponseStatus.OK)
-            case Failure(f) => respond(List.empty, HttpResponseStatus.OK)
-          }
-          case _ => respond(List.empty, HttpResponseStatus.OK)
-        }
+        withResult(s"votes:contest:$contestSlug")
       }
     }
   }
