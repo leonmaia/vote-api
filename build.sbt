@@ -11,6 +11,7 @@ libraryDependencies ++= Seq(
   "com.twitter" % "twitter-server_2.11" % "1.11.0",
   "com.twitter" % "finagle-core_2.11" % "6.26.0",
   "com.twitter" %% "finagle-http" % "6.26.0",
+  "joda-time" % "joda-time" % "2.8.1",
   "com.typesafe" % "config" % "1.3.0"
 )
 

@@ -1,16 +1,19 @@
 package com.mystique.util
 
-import java.text.SimpleDateFormat
-import java.util.Date
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
 
-object DateSupport {
+
+class DateSupport {
   val ISO_8601 = "yyyy-MM-dd"
 
-  val fmt = new SimpleDateFormat(ISO_8601)
+  def parse(d: String) = {
+    DateTime.parse(d, DateTimeFormat.forPattern(ISO_8601))
+  }
 
   def isValidDate(d: String) = {
-    fmt.parse(d) match {
-      case _: Date => true
+    parse(d) match {
+      case e: DateTime => true
       case _ => false
     }
   }
