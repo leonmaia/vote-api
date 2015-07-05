@@ -18,8 +18,6 @@ object Server extends TwitterServer with Router with DataStore {
       .bindTo(new InetSocketAddress("0.0.0.0", 8088))
       .name("Mystique API")
       .build(router)
-
-    Await.all(adminHttpServer)
   }
 }
 

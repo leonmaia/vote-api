@@ -96,6 +96,12 @@ class VoteHandlerSpec extends FlatSpec with Matchers with MockitoSugar with Json
     response.statusCode should be(200)
   }
 
+  it should "return status code 400" in {
+    when(redis.get(any())).thenReturn(Future(Option(StringToChannelBuffer("NOTLONG"))))
+    val response = Await.result(handler.vote("","")(buildRequest(token = "user-token" -> "lala", method = HttpMethod.POST)))
+    response.statusCode should be(400)
+  }
+
   trait TestRedisStore extends DataStore {
     redisClient = redis
   }
