@@ -17,5 +17,6 @@ trait Router extends Handlers {
 
     case Method.Post -> Root / "votes"   / contestSlug / idCandidate  => voteHandler.vote(contestSlug, idCandidate)
     case Method.Get  -> Root / "votes"   / contestSlug / idCandidate  => voteHandler.get(contestSlug, idCandidate)
+    case Method.Get  -> Root / "votes"   / contestSlug                => voteHandler.result(contestSlug)
   })
 }

@@ -10,7 +10,7 @@ import com.twitter.finagle.redis.Client
 import com.twitter.util.Future
 import org.jboss.netty.handler.codec.http.HttpResponseStatus
 
-import scala.util.{Try, Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 class VoteHandler(client: Client) extends Tracing {
   def vote(contestSlug: String, idCandidate: String) = new Service[Request, Response] {
@@ -27,12 +27,28 @@ class VoteHandler(client: Client) extends Tracing {
 
   def get(contestSlug: String, idCandidate: String) = new Service[Request, Response] {
     def apply(request: Request): Future[Response] = {
-      client.simpleGet(s"votes:contest:$contestSlug:candidate:$idCandidate") map {
-        case Some(v) => Try(v.toLong) match {
-          case Success(i) => respond(toJson(Vote(i)), HttpResponseStatus.OK)
-          case Failure(f) => respond(List.empty, HttpResponseStatus.OK)
+      withTrace("VoteHandler- #get", "VoteHandler") {
+        client.simpleGet(s"votes:contest:$contestSlug:candidate:$idCandidate") map {
+          case Some(v) => Try(v.toLong) match {
+            case Success(i) => respond(toJson(Vote(i)), HttpResponseStatus.OK)
+            case Failure(f) => respond(List.empty, HttpResponseStatus.OK)
+          }
+          case _ => respond(List.empty, HttpResponseStatus.OK)
         }
-        case _ => respond(List.empty, HttpResponseStatus.OK)
+      }
+    }
+  }
+
+  def result(contestSlug: String) = new Service[Request, Response] {
+    def apply(request: Request): Future[Response] = {
+      withTrace("VoteHandler- #result", "VoteHandler") {
+        client.simpleGet(s"votes:contest:$contestSlug") map {
+          case Some(v) => Try(v.toLong) match {
+            case Success(i) => respond(toJson(Vote(i)), HttpResponseStatus.OK)
+            case Failure(f) => respond(List.empty, HttpResponseStatus.OK)
+          }
+          case _ => respond(List.empty, HttpResponseStatus.OK)
+        }
       }
     }
   }
