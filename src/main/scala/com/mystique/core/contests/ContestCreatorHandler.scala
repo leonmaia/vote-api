@@ -15,13 +15,13 @@ import scala.util.{Failure, Success, Try}
 
 
 class ContestCreatorHandler (val redis: Client, config: Config) extends Service[Request, Response] with Tracing {
-
+  def createKey(c: Contest) = s"contest:slug=${c.slug}:name=${c.name}:start_date=${c.startDate}:end_date=${c.endDate}:description=${c.description.getOrElse("")}"
   def apply(request: Request): Future[Response] = {
     withTrace("ContestCreatorHandler - #apply", "ContestCreatorHandler") {
       Try(Contest(request)) match {
         case Success(c) => {
           val location = s"${config.getString("host")}/contests/${c.slug}"
-          redis.simpleHMSet(s"contest:${c.slug}", c.toMap)
+          redis.simpleHMSet(s"contest:slug=${c.slug}:name=${c.name}:start_date=${c.startDate}:end_date=${c.endDate}:description=${c.description.getOrElse("")}", c.toMap)
           Future(respond("", HttpResponseStatus.CREATED, locationHeader = location))
         }
         case Failure(f) =>
