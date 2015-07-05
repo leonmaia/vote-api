@@ -13,7 +13,7 @@ trait Tracing {
   val log = Logger(getClass)
 
   def withTrace[T](id: String, protocol: String = "custom", timeout: Duration = fromSeconds(1)) (block: => Future[T]) = {
-    if (ApiConfig.isNotDev) Trace.traceService(id, protocol, Option.empty) {
+    if (ApiConfig.isDev) Trace.traceService(id, protocol, Option.empty) {
       Trace.record(Annotation.ClientSend())
       val time = System.currentTimeMillis()
       withTimeout(id, timeout, block) map { res =>
