@@ -6,6 +6,7 @@ import com.twitter.util.Future
 
 object RedisUtils {
  implicit class SimpleRedis(val client: Client) {
+
    def simpleGet(key: String): Future[Option[String]] = {
      val k = StringToChannelBuffer(key)
      client.get(k) flatMap {
@@ -14,15 +15,15 @@ object RedisUtils {
      }
    }
 
-   def simpleSet(key: String, value: String): Future[Unit] = {
-     val k = StringToChannelBuffer(key)
-     val v = StringToChannelBuffer(value)
-     client.set(k, v)
+   def simpleINCRWithExpire(key: String, value: String, ttl: Long ) = {
+     simpleINCR(key) onSuccess { r =>
+       client.expire(StringToChannelBuffer(key), ttl)
+     }
    }
 
    def simpleINCR(key: String) = {
      val k = StringToChannelBuffer(key)
-     client.incr(k)
+     client.incr(k).map(_.toLong)
    }
 
    def simpleHMSet(key: String, hm: Map[String, String]): Future[Unit] = {

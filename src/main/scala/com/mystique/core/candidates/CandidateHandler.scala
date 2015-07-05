@@ -5,7 +5,7 @@ import com.mystique.server.http.Responses._
 import com.mystique.service.tracing.Tracing
 import com.mystique.util.RedisUtils._
 import com.twitter.finagle.Service
-import com.twitter.finagle.http.{Request, Response}
+import com.twitter.finagle.http.{HeaderMap, Request, Response}
 import com.twitter.finagle.redis.Client
 import com.twitter.util.{Await, Future}
 import com.typesafe.config.Config

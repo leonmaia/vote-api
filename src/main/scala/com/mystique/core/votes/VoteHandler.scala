@@ -13,16 +13,12 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus
 import scala.util.{Failure, Success, Try}
 
 class VoteHandler(client: Client) extends Tracing {
-  def vote(contestSlug: String, idCandidate: String) = new Service[Request, Response] {
-    def apply(request: Request): Future[Response] = {
-      withTrace("VoteHandler- #vote", "VoteHandler") {
-        val key = s"votes:contest:$contestSlug"
-        client.simpleINCR(key)
-        client.simpleINCR(s"$key:candidate:$idCandidate") map {
-          r => respond(toJson(Vote(r)), HttpResponseStatus.OK)
-        }
-      }
-    }
+
+  def respondWith(key: String, idCandidate: String)(f: ()=> Future[Long])  = {
+    f()
+    client.simpleINCR(key)
+    client.simpleINCR(s"$key:candidate:$idCandidate")
+    respond("", HttpResponseStatus.OK)
   }
 
   def withResult(key: String) = {
@@ -34,6 +30,23 @@ class VoteHandler(client: Client) extends Tracing {
       case _ => respond(List.empty, HttpResponseStatus.OK)
     }
   }
+
+  def vote(contestSlug: String, idCandidate: String) = new Service[Request, Response] {
+    def apply(request: Request): Future[Response] = withTrace("VoteHandler- #vote", "VoteHandler") {
+      val key = s"votes:contest:$contestSlug"
+      Option(request.headers().get("user-token")) match {
+        case Some(h) =>
+          client.simpleGet(s"user-token:$h") map {
+            case Some(s) =>
+              if (s.toInt > 5) respond("Wait a few minutes before voting again!", HttpResponseStatus.FORBIDDEN)
+              else respondWith(key, idCandidate){ ()=> client.simpleINCR(s"user-token:$h")}
+            case _ => respondWith(key, idCandidate)(()=> client.simpleINCRWithExpire(s"user-token:$h", "1", 600))
+          }
+        case _ => Future(respond("No user-token on header!", HttpResponseStatus.UNAUTHORIZED))
+      }
+    }
+  }
+
 
   def get(contestSlug: String, idCandidate: String) = new Service[Request, Response] {
     def apply(request: Request): Future[Response] = {
