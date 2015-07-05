@@ -14,7 +14,6 @@ import scala.util.{Failure, Success, Try}
 
 
 class ContestCreatorHandler (config: Config) extends Service[Request, Response] with Tracing with RedisStore {
-  def createKey(c: Contest) = s"contest:slug=${c.slug}:name=${c.name}:start_date=${c.startDate}:end_date=${c.endDate}:description=${c.description.getOrElse("")}"
   def apply(request: Request): Future[Response] = {
     withTrace("ContestCreatorHandler - #apply", "ContestCreatorHandler") {
       Try(Contest(request)) match {

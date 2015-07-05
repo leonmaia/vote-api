@@ -6,7 +6,6 @@ import com.mystique.server.http.Responses._
 import com.mystique.service.tracing.Tracing
 import com.twitter.finagle.Service
 import com.twitter.finagle.http.{Request, Response}
-import com.twitter.finagle.redis.Client
 import com.twitter.util.Future
 import org.jboss.netty.handler.codec.http.HttpResponseStatus
 
@@ -25,9 +24,9 @@ class VoteHandler extends Tracing with RedisStore{
     get(key) map {
       case Some(v) => Try(v.toLong) match {
         case Success(i) => respond(toJson(Vote(i)), HttpResponseStatus.OK)
-        case Failure(f) => respond(List.empty, HttpResponseStatus.OK)
+        case Failure(f) => respond(List.empty, HttpResponseStatus.BAD_REQUEST)
       }
-      case _ => respond(List.empty, HttpResponseStatus.OK)
+      case _ => respond(List.empty, HttpResponseStatus.NOT_FOUND)
     }
   }
 

@@ -6,13 +6,13 @@ import com.mystique.server.DataStore
 import com.mystique.util.JsonSupport
 import com.twitter.finagle.http.Request
 import com.twitter.finagle.redis.Client
-import com.twitter.util.Await
+import com.twitter.util.{Await, Future}
 import com.typesafe.config.Config
 import org.jboss.netty.handler.codec.http.HttpMethod
-import org.mockito.Matchers.anyString
+import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatest.{BeforeAndAfterEach, BeforeAndAfter, FlatSpec, Matchers}
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, FlatSpec, Matchers}
 
 class CandidateHandlerSpec extends FlatSpec with Matchers with MockitoSugar with JsonSupport with BeforeAndAfter with BeforeAndAfterEach{
   var config = mock[Config]
@@ -25,6 +25,7 @@ class CandidateHandlerSpec extends FlatSpec with Matchers with MockitoSugar with
     redis = mock[Client]
     handler = new CandidateHandler(config) with TestRedisStore
     when(config.getString(anyString)).thenReturn("localhost:8088")
+    when(redis.keys(any())).thenReturn(Future(Seq.empty))
   }
 
   def buildRequest(content: String, method: HttpMethod = HttpMethod.GET) = {
@@ -36,6 +37,12 @@ class CandidateHandlerSpec extends FlatSpec with Matchers with MockitoSugar with
     req
   }
 
+  behavior of "#list"
+
+  it should "return status code 200" in {
+    val response = Await.result(handler.list(any())(Request()))
+    response.statusCode should be(200)
+  }
 
   behavior of "#create"
 

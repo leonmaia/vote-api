@@ -6,7 +6,6 @@ import com.mystique.util.JsonSupport
 import com.twitter.finagle.http.Request
 import com.twitter.finagle.redis.Client
 import com.twitter.util.{Await, Future}
-import com.typesafe.config.Config
 import org.jboss.netty.buffer.ChannelBuffer
 import org.mockito.Matchers.any
 import org.mockito.Mockito._
