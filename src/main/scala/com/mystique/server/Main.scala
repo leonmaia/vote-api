@@ -8,7 +8,7 @@ import com.twitter.finagle.zipkin.thrift.ZipkinTracer
 import com.twitter.server.TwitterServer
 import com.twitter.util.Await
 
-object Server extends TwitterServer with Router {
+object Server extends TwitterServer with Router with DataStore {
 
   def main() {
     HttpMuxer.addRichHandler("/", router)

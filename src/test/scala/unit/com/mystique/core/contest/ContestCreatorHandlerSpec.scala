@@ -2,6 +2,7 @@ package unit.com.mystique.core.contest
 
 import com.mystique.core.contests.ContestCreatorHandler
 import com.mystique.models.Contest
+import com.mystique.server.DataStore
 import com.mystique.util.JsonSupport
 import com.twitter.finagle.http.Request
 import com.twitter.finagle.redis.Client
@@ -14,9 +15,17 @@ import org.mockito.Matchers.anyString
 
 class ContestCreatorHandlerSpec extends FlatSpec with Matchers with MockitoSugar with JsonSupport with BeforeAndAfter {
 
-  var redis = mock[Client]
   var config = mock[Config]
-  val handler = new ContestCreatorHandler(redis, config)
+  var request: Request = _
+  var handler: ContestCreatorHandler = _
+  implicit var redis: Client = _
+
+  before {
+    request = mock[Request]
+    redis = mock[Client]
+    handler = new ContestCreatorHandler(config) with TestRedisStore
+    when(config.getString(anyString)).thenReturn("localhost:8088")
+  }
 
   def buildRequest(content: String) = {
     val req = Request()
@@ -24,10 +33,6 @@ class ContestCreatorHandlerSpec extends FlatSpec with Matchers with MockitoSugar
     req.setContentTypeJson()
 
     req
-  }
-
-  before {
-    when(config.getString(anyString)).thenReturn("localhost:8088")
   }
 
   behavior of "#apply"
@@ -44,5 +49,9 @@ class ContestCreatorHandlerSpec extends FlatSpec with Matchers with MockitoSugar
     val response = Await.result(handler.apply(buildRequest(toJson(""))))
 
     response.statusCode should be(400)
+  }
+
+  trait TestRedisStore extends DataStore {
+    redisClient = redis
   }
 }

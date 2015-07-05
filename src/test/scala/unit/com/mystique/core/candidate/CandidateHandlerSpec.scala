@@ -2,6 +2,7 @@ package unit.com.mystique.core.candidate
 
 import com.mystique.core.candidates.CandidateHandler
 import com.mystique.models.Candidate
+import com.mystique.server.DataStore
 import com.mystique.util.JsonSupport
 import com.twitter.finagle.http.Request
 import com.twitter.finagle.redis.Client
@@ -11,12 +12,20 @@ import org.jboss.netty.handler.codec.http.HttpMethod
 import org.mockito.Matchers.anyString
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
+import org.scalatest.{BeforeAndAfterEach, BeforeAndAfter, FlatSpec, Matchers}
 
-class CandidateHandlerSpec extends FlatSpec with Matchers with MockitoSugar with JsonSupport with BeforeAndAfter {
-  var redis = mock[Client]
+class CandidateHandlerSpec extends FlatSpec with Matchers with MockitoSugar with JsonSupport with BeforeAndAfter with BeforeAndAfterEach{
   var config = mock[Config]
-  val handler = new CandidateHandler(redis, config)
+  var request: Request = _
+  var handler: CandidateHandler = _
+  implicit var redis: Client = _
+
+  before {
+    request = mock[Request]
+    redis = mock[Client]
+    handler = new CandidateHandler(config) with TestRedisStore
+    when(config.getString(anyString)).thenReturn("localhost:8088")
+  }
 
   def buildRequest(content: String, method: HttpMethod = HttpMethod.GET) = {
     val req = Request()
@@ -27,9 +36,6 @@ class CandidateHandlerSpec extends FlatSpec with Matchers with MockitoSugar with
     req
   }
 
-  before {
-    when(config.getString(anyString)).thenReturn("localhost:8088")
-  }
 
   behavior of "#create"
 
@@ -39,5 +45,9 @@ class CandidateHandlerSpec extends FlatSpec with Matchers with MockitoSugar with
 
     response.statusCode should be(201)
     response.location should be(Option("localhost:8088/contest/vote1/candidate"))
+  }
+
+  trait TestRedisStore extends DataStore {
+    redisClient = redis
   }
 }
