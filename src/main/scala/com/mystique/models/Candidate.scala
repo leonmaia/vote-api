@@ -18,7 +18,7 @@ object Candidate extends JsonSupport {
 
   def fromKey(key: String): Candidate = {
     var map = scala.collection.mutable.Map[String, String]()
-    key.split(":").toList map(x => map += x.split("=").head -> x.split("=").last)
+    key.split("::").toList map(x => map += x.split("=").head -> x.split("=").last)
 
     Candidate(map.getOrElse("id", "").toInt, map.getOrElse("name", ""), map.get("avatar"))
   }

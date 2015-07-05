@@ -16,15 +16,18 @@ import scala.util.{Failure, Success, Try}
 class CandidateHandler(config: Config) extends Tracing with RedisStore {
 
   def create(contestSlug: String) = new Service[Request, Response] {
-    def createKey(c: Candidate): String = s"candidate:contest=$contestSlug:id=${c.id}:name=${c.name}:avatar=${c.avatar.getOrElse("")}"
+    def createKey(c: Candidate): String = s"candidate::contest=$contestSlug::id=${c.id}::name=${c.name}::avatar=${c.avatar.getOrElse("")}"
     def apply(request: Request): Future[Response] = {
       withTrace("CandidateHandler- #create", "CandidateHandler") {
         Try(Candidate(request)) match {
-          case Success(c) => {
-            val location = s"${config.getString("host")}/contest/$contestSlug/candidate"
-            hmSet(createKey(c), c.toMap)
-            Future(respond("", HttpResponseStatus.CREATED, locationHeader = location))
-          }
+          case Success(c) =>
+            getKeys(s"candidate::contest=*::id=${c.id}::name=*::avatar=*") map {
+              case x if x.isEmpty =>
+                val location = s"${config.getString("host")}/contest/$contestSlug/candidate"
+                hmSet(createKey(c), c.toMap)
+                respond("", HttpResponseStatus.CREATED, locationHeader = location)
+              case _ => respond("", HttpResponseStatus.CONFLICT)
+            }
           case Failure(f) =>
             Future(respond(s"Errors!", HttpResponseStatus.BAD_REQUEST))
         }
@@ -35,7 +38,7 @@ class CandidateHandler(config: Config) extends Tracing with RedisStore {
   def list(contestSlug: String) = new Service[Request, Response] {
     def apply(request: Request): Future[Response] = {
       withTrace("CandidateHandler- # list", "CandidateHandler") {
-        getKeys(s"candidate:contest=$contestSlug:*") map {
+        getKeys(s"candidate::contest=$contestSlug::*") map {
           case r: List[String] => {
             respond(toJson(r map Candidate.fromKey), HttpResponseStatus.OK)
           }

@@ -16,7 +16,7 @@ import scala.util.{Failure, Success}
 class ContestHandler extends Service[Request, Response] with Tracing with RedisStore{
   def apply(request: Request): Future[Response] = {
     withTrace("ContestHandler - #apply", "ContestHandler") {
-      getKeys(s"contest:*") map {
+      getKeys(s"contest::*") map {
         case r: List[String] => {
           respond(toJson(r map Contest.fromKey), HttpResponseStatus.OK)
         }

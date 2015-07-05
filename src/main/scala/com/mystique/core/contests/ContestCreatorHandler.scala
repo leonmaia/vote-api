@@ -18,9 +18,13 @@ class ContestCreatorHandler (config: Config) extends Service[Request, Response] 
     withTrace("ContestCreatorHandler - #apply", "ContestCreatorHandler") {
       Try(Contest(request)) match {
         case Success(c) => {
-          val location = s"${config.getString("host")}/contests/${c.slug}"
-          hmSet(s"contest:slug=${c.slug}:name=${c.name}:start_date=${c.startDate}:end_date=${c.endDate}:description=${c.description.getOrElse("")}", c.toMap)
-          Future(respond("", HttpResponseStatus.CREATED, locationHeader = location))
+          getKeys(s"contest::slug=${c.slug}::name=*::*") map {
+            case x if x.isEmpty =>
+              val location = s"${config.getString("host")}/contests/${c.slug}"
+              hmSet(s"contest::slug=${c.slug}::name=${c.name}::start_date=${c.startDate}::end_date=${c.endDate}::description=${c.description.getOrElse("")}", c.toMap)
+              respond("", HttpResponseStatus.CREATED, locationHeader = location)
+            case _ => respond("", HttpResponseStatus.CONFLICT)
+          }
         }
         case Failure(f) =>
           Future(respond("Errors!", HttpResponseStatus.BAD_REQUEST))

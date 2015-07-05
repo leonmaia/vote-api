@@ -18,7 +18,7 @@ object Contest extends JsonSupport{
 
   def fromKey(key: String): Contest = {
     var map = scala.collection.mutable.Map[String, String]()
-    key.split(":").toList map(x => map += x.split("=").head -> x.split("=").last)
+    key.split("::").toList map(x => map += x.split("=").head -> x.split("=").last)
 
     Contest(map.getOrElse("slug", ""), map.getOrElse("name", ""), map.get("description"), map.getOrElse("start_date", ""), map.getOrElse("end_date", ""))
   }
