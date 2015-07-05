@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonMappingException
 import com.mystique.util.JsonSupport
 import com.twitter.finagle.http.Request
 
+
 object Candidate extends JsonSupport {
   def apply(request: Request): Candidate={
     try {
@@ -15,11 +16,11 @@ object Candidate extends JsonSupport {
     }
   }
 
-  def fromMap(map: Map[String, String]): Candidate = {
-    Candidate(
-      map.get("id").get.toInt,
-      map.get("name").get,
-      map.get("avatar"))
+  def fromKey(key: String): Candidate = {
+    var map = scala.collection.mutable.Map[String, String]()
+    key.split(":").toList map(x => map += x.split("=").head -> x.split("=").last)
+
+    Candidate(map.getOrElse("id", "").toInt, map.getOrElse("name", ""), map.get("avatar"))
   }
 }
 

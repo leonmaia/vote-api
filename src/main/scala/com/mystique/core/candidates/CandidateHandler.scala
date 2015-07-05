@@ -16,12 +16,13 @@ import scala.util.{Failure, Success, Try}
 class CandidateHandler(val redis: Client, config: Config) extends Tracing {
 
   def create(contestSlug: String) = new Service[Request, Response] {
+    def createKey(c: Candidate): String = s"candidate:contest=$contestSlug:id=${c.id}:name=${c.name}:avatar=${c.avatar.getOrElse("")}"
     def apply(request: Request): Future[Response] = {
       withTrace("CandidateHandler- #create", "CandidateHandler") {
         Try(Candidate(request)) match {
           case Success(c) => {
             val location = s"${config.getString("host")}/contest/$contestSlug/candidate"
-            redis.simpleHMSet(s"candidate:contest:$contestSlug:id:${c.id}", c.toMap)
+            redis.simpleHMSet(createKey(c), c.toMap)
             Future(respond("", HttpResponseStatus.CREATED, locationHeader = location))
           }
           case Failure(f) =>
@@ -34,9 +35,10 @@ class CandidateHandler(val redis: Client, config: Config) extends Tracing {
   def list(contestSlug: String) = new Service[Request, Response] {
     def apply(request: Request): Future[Response] = {
       withTrace("CandidateHandler- # list", "CandidateHandler") {
-        val keys = Await.result(redis.simpleGetKeys(s"candidate:contest:$contestSlug:*"))
-        redis.simpleHMGetAll(keys) map {
-          case Some(r) => respond(toJson(r map Candidate.fromMap), HttpResponseStatus.OK)
+        redis.simpleGetKeys(s"candidate:contest=$contestSlug:*") map {
+          case r: List[String] => {
+            respond(toJson(r map Candidate.fromKey), HttpResponseStatus.OK)
+          }
           case _ => respond(List.empty, HttpResponseStatus.OK)
         }
       }
