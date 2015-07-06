@@ -1,0 +1,11 @@
+- name: install Redis server
+  sudo: yes
+  apt: name=redis-server state=latest update_cache=yes
+
+- name: check if Redis is running
+  sudo: yes
+  service: name=redis-server state=started
+
+- name: enable redis-server to survive reboot
+  sudo: yes
+  service: name=redis-server enabled=yes

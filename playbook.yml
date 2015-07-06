@@ -1,0 +1,12 @@
+---
+- hosts: all
+  serial: 1
+  user: vagrant
+  vars:
+    project_name: mystique
+
+  tasks:
+    - include: ansible/tasks/java8.yml
+    - include: ansible/tasks/sbt.yml
+    - include: ansible/tasks/redis.yml
+    - include: ansible/tasks/app.yml

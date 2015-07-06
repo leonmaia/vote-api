@@ -1,0 +1,20 @@
+---
+- name: Add Upstart script
+  copy: src=ansible/files/startup/mystique.conf dest=/etc/init/mystique.conf owner=root group=root mode=0644
+  sudo: yes
+  tags:
+    - api
+    - config
+
+- name: Build assembly package
+  command: java -jar /opt/sbt/sbt.jar clean assembly
+  args:
+    chdir: /vagrant
+  tags:
+    - app
+
+- name: Start mystique service if its not running
+  service: name=mystique state=started enabled=yes
+  sudo: yes
+  tags:
+    - api

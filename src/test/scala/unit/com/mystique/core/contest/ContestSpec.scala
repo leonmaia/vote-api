@@ -19,7 +19,7 @@ class ContestSpec extends FlatSpec with Matchers with MockitoSugar with JsonSupp
 
   it should "parse from redis key" in {
     val possibleKey =
-      "contest:slug=thevoice:name=Globo:start_date=2015-06-20:end_date=2016-01-01:description=the voice brazil 2015"
+      "contest::slug=thevoice::name=Globo::start_date=2015-06-20::end_date=2016-01-01::description=the voice brazil 2015"
 
     val contest = Contest.fromKey(possibleKey)
 

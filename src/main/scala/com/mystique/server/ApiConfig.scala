@@ -4,8 +4,8 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 object ApiConfig  extends Log {
 
-  var config: Config = null
-  var env: String = null
+  var config: Config = _
+  var env: String = _
 
   def load(env: String) = {
     config = ConfigFactory.load("application.conf").getConfig(env)

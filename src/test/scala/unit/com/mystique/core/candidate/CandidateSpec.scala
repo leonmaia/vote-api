@@ -10,7 +10,7 @@ class CandidateSpec extends FlatSpec with Matchers with MockitoSugar with JsonSu
   behavior of "#fromKey"
 
   it should "parse from redis key" in {
-    val possibleKey = "candidate:contest=thevoice:id=1:name=Garoto:avatar=avatar.jpg"
+    val possibleKey = "candidate::contest=thevoice::id=1::name=Garoto::avatar=avatar.jpg"
     val candidate = Candidate.fromKey(possibleKey)
 
     candidate.name should be("Garoto")

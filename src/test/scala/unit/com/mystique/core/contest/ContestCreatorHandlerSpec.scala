@@ -3,11 +3,13 @@ package unit.com.mystique.core.contest
 import com.mystique.core.contests.ContestCreatorHandler
 import com.mystique.models.Contest
 import com.mystique.server.DataStore
+import org.mockito.Matchers.any
 import com.mystique.util.JsonSupport
 import com.twitter.finagle.http.Request
 import com.twitter.finagle.redis.Client
-import com.twitter.util.Await
+import com.twitter.util.{Future, Await}
 import com.typesafe.config.Config
+import org.jboss.netty.buffer.ChannelBuffer
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
@@ -25,6 +27,7 @@ class ContestCreatorHandlerSpec extends FlatSpec with Matchers with MockitoSugar
     redis = mock[Client]
     handler = new ContestCreatorHandler(config) with TestRedisStore
     when(config.getString(anyString)).thenReturn("localhost:8088")
+    when(redis.keys(any[ChannelBuffer])).thenReturn(Future(Seq.empty))
   }
 
   def buildRequest(content: String) = {

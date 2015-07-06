@@ -6,6 +6,13 @@ version := "1.0"
 
 scalaVersion := "2.11.5"
 
+resolvers ++= Seq(
+  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+  "Twitter repo" at "http://maven.twttr.com/",
+  "Sedis" at "http://pk11-scratch.googlecode.com/svn/trunk",
+  "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
+)
+
 libraryDependencies ++= Seq(
   "com.twitter" % "finagle-redis_2.11" % "6.26.0",
   "com.twitter" % "twitter-server_2.11" % "1.11.0",

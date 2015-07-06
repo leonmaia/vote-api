@@ -1,0 +1,28 @@
+---
+- name: Creates opt/sbt
+  file: path=/opt/sbt state=directory owner=vagrant group=vagrant mode=0755
+  sudo: yes
+  tags:
+    - sbt
+    - packages
+
+- name: download sbt-launch.jar
+  get_url: url=https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.7/sbt-launch.jar?_ga=1.134549873.1636856000.1421340642 dest=/opt/sbt/sbt.jar validate_certs=no
+  sudo: yes
+  tags:
+    - sbt
+    - packages
+
+- name: set permissions to sbt-launch.jar
+  file: path=/opt/sbt/sbt.jar owner=vagrant group=vagrant mode=0755
+  sudo: yes
+  tags:
+    - sbt
+    - packages
+
+- name: sbt launch script
+  copy: src=ansible/files/sbt/sbt dest=/bin/sbt owner=vagrant group=vagrant mode=0755
+  sudo: yes
+  tags:
+    - sbt
+    - packages
